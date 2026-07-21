@@ -1,0 +1,2 @@
+"""Pairs trading research lab."""
+
