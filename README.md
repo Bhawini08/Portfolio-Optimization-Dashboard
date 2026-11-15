@@ -1,105 +1,26 @@
 # Pairs Trading Research Lab
 
-A GitHub-ready quant research project for exploring a **sector-based pairs trading strategy** with:
+This Streamlit app tests long/short spreads using pairs and hedge ratios selected on training data before each test window.
 
-- automated pair discovery
-- hedge ratio estimation
-- rolling z-score entry and exit rules
-- realistic transaction costs and slippage
-- walk-forward out-of-sample validation
-- equity curve, drawdown, and trade log analysis
-- a synthetic demo mode when live data is unavailable
+## Results from three walk-forward folds
 
-The project is designed to look and feel like a real research workflow, not just a toy backtest.
+Adjusted Yahoo Finance daily prices for XLE, XOP, XLF, KBE, JPM, BAC, WFC and GS produced **6.61% annualized return** after fees and slippage, a **1.18 Sharpe** and **-4.22% maximum drawdown**. One fold lost money, and there were only seven logged trades.
 
-## Why this is strong for quant roles
+| Test window | Pair | Annualized return | Sharpe | Logged trades |
+| --- | --- | ---: | ---: | ---: |
+| Nov 18, 2025–Feb 19, 2026 | XLF / GS | 8.28% | 1.44 | 3 |
+| Feb 20–May 20, 2026 | XLF / JPM | -5.19% | -0.83 | 1 |
+| May 21–Aug 20, 2026 | JPM / BAC | 18.02% | 3.56 | 3 |
 
-This project maps directly to how systematic trading ideas are evaluated in practice:
+The input period was November 14, 2024–October 30, 2026. The run uses a 252-session training window, a 63-session test window, a 60-session signal lookback, a 0.55 absolute return-correlation filter and 1 bp each for fees and slippage per unit of turnover. The remaining observations did not fill a fourth test window.
 
-- you define a hypothesis about mean reversion
-- you select candidate pairs from a universe
-- you estimate a hedge ratio on training data
-- you validate out-of-sample with walk-forward testing
-- you include costs, slippage, and risk metrics
-- you inspect trade-level behavior, not just a single headline Sharpe
+The backtest applies the prior-close signal to the next close-to-close return. It does not model a separate next-open fill, borrow costs or a liquidation charge at fold boundaries. The single-pair view is exploratory and should not be read as out-of-sample evidence.
 
-That makes it especially relevant for:
-
-- quant trading roles
-- systematic research roles
-- pair trading / stat arb teams
-- hedge fund internships
-
-## Features
-
-- Live price download with `yfinance`
-- Synthetic fallback dataset with a built-in mean-reverting pair
-- Pair ranking across the candidate universe
-- Static-hedge and strategy equity curve comparison
-- Walk-forward testing across multiple folds
-- Trade log and summary statistics
-- CSV export for results
-
-## Tech Stack
-
-- Python
-- NumPy
-- Pandas
-- SciPy
-- Streamlit
-- Plotly
-- yfinance
-
-## Quick Start
+### Open the app
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Suggested Universe
-
-Good starter universes:
-
-```text
-XLE, XOP, XLF, KBE, JPM, BAC, WFC, GS
-```
-
-You can also try:
-
-- `GOOG, GOOGL`
-- `KO, PEP`
-- `XLI, IYT, CAT, DE`
-- `JPM, BAC, WFC, C`
-
-## What the App Does
-
-1. Downloads historical prices or uses a synthetic fallback.
-2. Ranks candidate pairs based on correlation, hedge ratio, and mean reversion strength.
-3. Either backtests the top pair directly or runs walk-forward research.
-4. Applies realistic costs and slippage when positions change.
-5. Visualizes equity, drawdown, spread behavior, and trade history.
-
-## Project Structure
-
-```text
-.
-├── app.py
-├── requirements.txt
-└── src/
-    └── pairs_trading_lab/
-        ├── __init__.py
-        ├── data.py
-        ├── backtest.py
-        ├── research.py
-        └── metrics.py
-```
-
-## Resume Bullet
-
-You can use a sharper bullet like:
-
-> Built a Streamlit pairs trading research lab with automated pair selection, rolling hedge ratio estimation, walk-forward backtesting, and realistic transaction cost modeling to evaluate stat-arb signals across sector universes.
-
+The app falls back to labeled synthetic prices when Yahoo Finance is unavailable. If the demo finds no eligible pair under the default filter, lower the minimum correlation.
